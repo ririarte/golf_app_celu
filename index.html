@@ -101,7 +101,7 @@ async function exportar(id,compartir){
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=nom;document.body.appendChild(a);a.click();a.remove();
   setTimeout(()=>URL.revokeObjectURL(a.href),4000);
 }
-const box=(k,t,v,lbl,off)=>`<div class="box${off?' off':''}" ${off?'':`onclick="pick('${k}','${t}',${k=='pp'?'0,40,1':k=='ay'?'0,250,5':k=='am'?'0,15,1':'0,10,1'})"`}><b>${v||(k=='am'?'—':0)}</b><i>${lbl}</i></div>`;
+const box=(k,t,v,lbl,off)=>`<div class="box${off?' off':''}" ${off?'':`onclick="pick('${k}','${t}',${k=='pp'?'0,40,1':k=='ay'?'0,250,5':k=='am'?'0,15,1':'0,10,1'})"`}><b>${v===null ? (k=='am'?'—':'') : v}</b><i>${lbl}</i></div>`;
 function vHome(){
   const ids=Object.keys(db.rondas).sort().reverse();
   return `<h1>Golf</h1>${ok?`<div class=ok>${ok}</div>`:''}${msg?`<div class=err>${esc(msg)}</div>`:''}
