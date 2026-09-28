@@ -50,7 +50,24 @@ const signo=n=>n>0?'+'+n:n<0?String(n):'E';
 function save(){try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){msg='No se pudo guardar en el celular: '+e.message}}
 const R=()=>db.rondas[db.actual];
 const par=n=>CANCHAS[R().cancha][n-1][0], hcp=n=>CANCHAS[R().cancha][n-1][1];
-function H(n){const r=R();return r.h[n]||(r.h[n]={pp:0,pg:0,ay:0,ag:0,pen:0,s:0,am:0,ok:0})}
+function H(n){
+  const r = R();
+  if(!r.h[n]){
+    r.h[n] = {
+      pp: null,   // pasos putt
+      pg: null,   // golpes putt
+      ay: null,   // yardas apch
+      ag: null,   // golpes apch
+      pen: null,  // penalties
+      s: null,    // golpes S+2+3
+      am: null,   // compañero (opcional)
+      ok: 0       // confirmado
+    };
+  }
+  return r.h[n];
+}
+
+
 const mio=(n)=>{const h=H(n);return h.pg+h.ag+(par(n)==3?0:h.s)+h.pen};
 function nueva(){
   const c=$('cancha').value,yo=$('yo').value.trim()||'YO',am=$('amigo').value.trim();
