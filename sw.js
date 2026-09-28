@@ -1,41 +1,143 @@
-const CACHE_NAME = 'golf-v2';
-const URLS_TO_CACHE = [
-  './',
-  'index.html',
-  'manifest.webmanifest',
-  'main.js',
-  'style.css'
+const CACHE_NAME = "golf-v3";
+
+const APP_FILES = [
+  "./",
+  "./index.html",
+  "./manifest.webmanifest"
 ];
 
-self.addEventListener('install', event => {
+
+/* =========================================================
+   INSTALACION
+   ========================================================= */
+
+self.addEventListener("install", event => {
+
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(URLS_TO_CACHE))
+
+    caches
+      .open(CACHE_NAME)
+      .then(cache => cache.addAll(APP_FILES))
+
   );
+
   self.skipWaiting();
 });
 
-self.addEventListener('activate', event => {
+
+/* =========================================================
+   ACTIVACION
+   ========================================================= */
+
+self.addEventListener("activate", event => {
+
   event.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))
-    )
+
+    caches
+      .keys()
+      .then(keys =>
+
+        Promise.all(
+
+          keys
+            .filter(key => key !== CACHE_NAME)
+            .map(key => caches.delete(key))
+
+        )
+
+      )
+
   );
+
   self.clients.claim();
 });
 
-self.addEventListener('fetch', event => {
-  if (event.request.method !== 'GET') return;
+
+/* =========================================================
+   FETCH
+   ========================================================= */
+
+self.addEventListener("fetch", event => {
+
+  if(event.request.method !== "GET"){
+    return;
+  }
+
+
+  /*
+     Para index.html usamos NETWORK FIRST.
+
+     Esto es importante porque cuando subas una
+     nueva versión a GitHub, el teléfono intentará
+     primero obtener la versión nueva.
+  */
+
+  if(
+    event.request.mode === "navigate" ||
+    event.request.url.endsWith("/index.html")
+  ){
+
+    event.respondWith(
+
+      fetch(event.request)
+        .then(response => {
+
+          const copy = response.clone();
+
+          caches
+            .open(CACHE_NAME)
+            .then(cache => {
+              cache.put(event.request, copy);
+            });
+
+          return response;
+
+        })
+        .catch(() => {
+
+          return caches.match("./index.html");
+
+        })
+
+    );
+
+    return;
+  }
+
+
+  /*
+     Para los demás archivos:
+
+     primero intenta la red y, si no hay conexión,
+     usa la copia guardada.
+  */
 
   event.respondWith(
-    caches.match(event.request).then(cachedResponse => {
-      if (cachedResponse) return cachedResponse;
-      return fetch(event.request).then(networkResponse => {
-        const responseClone = networkResponse.clone();
-        caches.open(CACHE_NAME).then(cache => {
-          cache.put(event.request, responseClone);
-        });
-        return networkResponse;
-      }).catch(() => caches.match('index.html'));
-    })
+
+    fetch(event.request)
+      .then(response => {
+
+        if(response && response.ok){
+
+          const copy = response.clone();
+
+          caches
+            .open(CACHE_NAME)
+            .then(cache => {
+              cache.put(event.request, copy);
+            });
+
+        }
+
+        return response;
+
+      })
+      .catch(() => {
+
+        return caches.match(event.request);
+
+      })
+
   );
+
 });
