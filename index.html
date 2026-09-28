@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#ffffff"><meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.webmanifest"><title>Golf</title>
+<style>
+*{box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:#fff;color:#1c1c1e;user-select:none}
+#app{max-width:440px;margin:0 auto;padding:6px 8px 90px}
+h1{font-size:20px;margin:10px 2px}h2{font-size:14px;margin:16px 2px 6px;text-transform:uppercase;letter-spacing:.4px}
+.hd{display:flex;align-items:center;justify-content:space-between;padding:4px 2px 8px;border-bottom:1px solid #e5e5ea}
+.hd b{font-size:15px}.hn{font-size:40px;font-weight:900;line-height:1}.tg{font-size:13px;font-weight:800;line-height:1.15}
+.run{font-size:13px;font-weight:700;color:#636366;margin:6px 2px}
+.blk{background:#f2f2f7;border-radius:10px;padding:8px 10px;margin-top:8px}
+.lbl{font-size:13px;font-weight:800;text-transform:uppercase;margin-bottom:6px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.box{height:78px;background:#fff;border:1px solid #d1d1d6;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.box b{font-size:38px;line-height:1}.box i{font-size:11px;font-style:normal;font-weight:800;color:#636366;margin-top:2px}
+.box.off{opacity:.4}.tot{background:#e5e5ea;border:1.5px solid #8e8e93;border-radius:10px;padding:8px 10px;margin-top:8px}
+.bar{position:fixed;left:0;right:0;bottom:0;background:#fff;padding:8px 8px calc(8px + env(safe-area-inset-bottom));display:flex;gap:8px;max-width:440px;margin:0 auto}
+button{border:0;border-radius:8px;height:50px;font-size:14px;font-weight:800;background:#e5e5ea;color:#000;padding:0 12px}
+.bar button{flex:1}.bar .go{flex:2;background:#1c1c1e;color:#fff}.pri{background:#1c1c1e;color:#fff}
+.err{background:#ffe5e5;color:#a00;border-radius:8px;padding:10px;margin:8px 0;font-weight:700;font-size:14px}
+.ok{background:#e3f6e8;color:#116b2b;border-radius:8px;padding:10px;margin:8px 0;font-weight:700;font-size:14px}
+input,select{width:100%;height:48px;font-size:17px;border:1px solid #d1d1d6;border-radius:8px;padding:0 10px;background:#fff;margin-bottom:8px;user-select:text}
+.card{background:#f2f2f7;border-radius:10px;padding:10px;margin-bottom:8px}.card p{margin:0 0 8px;font-size:15px}
+.row{display:flex;gap:6px}.row button{flex:1;height:44px}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9}
+.sh{position:fixed;left:0;right:0;bottom:0;background:#fff;border-radius:18px 18px 0 0;padding:12px 12px calc(12px + env(safe-area-inset-bottom));max-height:70vh;overflow:auto;max-width:440px;margin:0 auto}
+.sh h3{margin:0 0 8px;font-size:13px;color:#8e8e93;text-align:center;text-transform:uppercase}
+.gr{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.gr button{height:56px;font-size:22px;background:#f2f2f7}.gr .sel{background:#007aff;color:#fff}.gr .dn{background:#1c1c1e;color:#fff}
+</style></head><body><div id="app"></div>
+<script>
+const CANCHAS={"Palermo GC (Blancas)":[[4,9],[4,7],[4,13],[4,3],[3,11],[5,1],[3,17],[4,15],[4,5],[3,16],[5,14],[4,6],[3,18],[5,2],[4,8],[5,12],[4,4],[4,10]]};
+const KEY='golf_v1';
+let db=JSON.parse(localStorage.getItem(KEY)||'null')||{actual:null,rondas:{},pref:{yo:'',amigo:''}};
+let vista='home',picker=null,irA=false,msg='',ok='';
+const $=s=>document.getElementById(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const signo=n=>n>0?'+'+n:n<0?String(n):'E';
+function save(){try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){msg='No se pudo guardar en el celular: '+e.message}}
+const R=()=>db.rondas[db.actual];
+const par=n=>CANCHAS[R().cancha][n-1][0], hcp=n=>CANCHAS[R().cancha][n-1][1];
+function H(n){const r=R();return r.h[n]||(r.h[n]={pp:0,pg:0,ay:0,ag:0,pen:0,s:0,am:0,ok:0})}
+const mio=(n)=>{const h=H(n);return h.pg+h.ag+(par(n)==3?0:h.s)+h.pen};
+function nueva(){
+  const c=$('cancha').value,yo=$('yo').value.trim()||'YO',am=$('amigo').value.trim();
+  const id=new Date().toISOString();
+  db.pref={yo:yo==='YO'?'':yo,amigo:am};
+  db.rondas[id]={id,fecha:new Date().toISOString(),cancha:c,yo,amigo:am||'AMIGO',hoyo:1,h:{}};
+  db.actual=id;vista='hoyo';msg='';ok='';save();render();
+}
+function continuar(id){db.actual=id;vista='hoyo';msg='';ok='';irA=false;save();render()}
+function salir(){vista='home';picker=null;irA=false;save();render()}
+function pick(k,t,min,max,step){picker={k,t,min,max,step};render()}
+function setv(v){H(R().hoyo)[picker.k]=v;picker=null;msg='';save();render()}
+function ir(n){R().hoyo=n;irA=false;msg='';save();render()}
+function confirmar(){
+  const r=R(),n=r.hoyo,h=H(n),f=[];
+  if(!(h.ag>0))f.push('APCH');
+  if(par(n)!=3&&!(h.s>0))f.push('S+2+3');
+  if(f.length){msg='No se puede avanzar. Falta: '+f.join(' · ');render();return}
+  h.ok=1;msg='';
+  if(n<18){r.hoyo=n+1}else{vista='home';ok='Ronda completa. Exportala para tener una copia.'}
+  save();render();
+}
+function borrar(id){if(confirm('¿Borrar esta ronda del celular? No se puede deshacer.')){delete db.rondas[id];if(db.actual===id)db.actual=null;save();render()}}
+async function exportar(id,compartir){
+  const r=db.rondas[id],nom='ronda_'+r.fecha.slice(0,10)+'_'+r.fecha.slice(11,16).replace(':','')+'_'+r.yo.replace(/\W+/g,'_')+'.json';
+  const blob=new Blob([JSON.stringify(r,null,2)],{type:'application/json'});
+  const file=new File([blob],nom,{type:'application/json'});
+  if(compartir&&navigator.canShare&&navigator.canShare({files:[file]})){
+    try{await navigator.share({files:[file],title:nom});return}catch(e){if(e.name==='AbortError')return}
+  }
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=nom;document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+}
+const box=(k,t,v,lbl,off)=>`<div class="box${off?' off':''}" ${off?'':`onclick="pick('${k}','${t}',${k=='pp'?'0,40,1':k=='ay'?'0,250,5':k=='am'?'0,15,1':'0,10,1'})"`}><b>${v||(k=='am'?'—':0)}</b><i>${lbl}</i></div>`;
+function vHome(){
+  const ids=Object.keys(db.rondas).sort().reverse();
+  return `<h1>Golf</h1>${ok?`<div class=ok>${ok}</div>`:''}${msg?`<div class=err>${esc(msg)}</div>`:''}
+  <h2>Nueva ronda</h2><select id=cancha>${Object.keys(CANCHAS).map(c=>`<option>${esc(c)}</option>`).join('')}</select>
+  <input id=yo placeholder="Tu nombre" value="${esc(db.pref.yo||'')}"><input id=amigo placeholder="Amigo (opcional)" value="${esc(db.pref.amigo||'')}">
+  <button class=pri style="width:100%" onclick="nueva()">Empezar ronda</button>
+  <h2>Rondas guardadas en este celular</h2>${ids.length?'':'<p>Todavía no hay rondas.</p>'}
+  ${ids.map(id=>{const r=db.rondas[id],n=Object.values(r.h).filter(x=>x.ok).length;
+  return `<div class=card><p><b>${r.fecha.slice(8,10)}/${r.fecha.slice(5,7)}/${r.fecha.slice(0,4)} ${new Date(r.fecha).toTimeString().slice(0,5)}</b><br>${esc(r.yo)} vs ${esc(r.amigo)} · ${esc(r.cancha)}<br>${n}/18 hoyos${n<18?` · sigue en el ${r.hoyo}`:''}</p>
+  <div class=row><button class=pri onclick="continuar('${id}')">${n<18?'Continuar':'Abrir'}</button><button onclick="exportar('${id}',true)">Compartir</button><button onclick="exportar('${id}',false)">Descargar</button><button onclick="borrar('${id}')">✕</button></div></div>`}).join('')}`;
+}
+function vHoyo(){
+  const r=R(),n=r.hoyo,h=H(n),p=par(n);
+  let tot=0,pp=0;for(let i=1;i<=18;i++){const x=r.h[i];if(x&&x.ok){tot+=mio(i);pp+=par(i)}}
+  return `<div class=hd><b>${esc(r.cancha)}</b><span class=hn>${n}</span><span class=tg>PAR ${p}<br>HCP ${hcp(n)}</span></div>
+  <div class=run>${esc(r.yo)}: ${tot} golpes (${signo(tot-pp)}) en ${Object.values(r.h).filter(x=>x.ok).length} hoyos${h.ok?' · hoyo ya confirmado':''}</div>
+  ${msg?`<div class=err>${esc(msg)}</div>`:''}
+  <div class=blk><div class=lbl>⛳ Putts</div><div class=g2>${box('pp','PASOS PUTT',h.pp,'PASOS')}${box('pg','GOLPES PUTT',h.pg,'GOLPES')}</div></div>
+  <div class=blk><div class=lbl>🎯 APCH</div><div class=g2>${box('ay','YARDAS APCH',h.ay,'YARDAS')}${box('ag','GOLPES APCH',h.ag,'GOLPES')}</div></div>
+  <div class=blk><div class=g2><div class=lbl>Penalties</div><div class=lbl>🏌️ S+2+3</div></div><div class=g2>${box('pen','PENALTIES',h.pen,'GOLPES NETOS')}${box('s','GOLPES S+2+3',p==3?0:h.s,'GOLPES',p==3)}</div></div>
+  <div class=tot><div class=g2><div><div class=lbl>👥 ${esc(r.amigo)}</div>${box('am','TOTAL '+esc(r.amigo),h.am,'TOTAL (opcional)')}</div>
+  <div><div class=lbl>👤 ${esc(r.yo)}</div><div class=box><b>${mio(n)}</b><i>TOTAL</i></div></div></div></div>
+  <div class=bar><button onclick="salir()">✕ SALIR</button><button onclick="irA=true;render()">IR A…</button><button class=go onclick="confirmar()">CONFIRMAR Y AVANZAR ➔</button></div>`;
+}
+function sheet(){
+  if(irA){const r=R();return `<div class=ov onclick="irA=false;render()"></div><div class=sh><h3>Ir al hoyo</h3><div class=gr>${[...Array(18)].map((_,i)=>`<button class="${i+1==r.hoyo?'sel':(r.h[i+1]&&r.h[i+1].ok)?'dn':''}" onclick="ir(${i+1})">${i+1}</button>`).join('')}</div></div>`}
+  if(picker){const cur=H(R().hoyo)[picker.k],b=[];for(let v=picker.min;v<=picker.max;v+=picker.step)b.push(`<button class="${v==cur?'sel':''}" onclick="setv(${v})">${v}</button>`);
+    return `<div class=ov onclick="picker=null;render()"></div><div class=sh><h3>${picker.t}</h3><div class=gr>${b.join('')}</div></div>`}
+  return '';
+}
+function render(){
+  if(vista=='hoyo'&&!R())vista='home';
+  const y=window.scrollY;
+  $('app').innerHTML=(vista=='home'?vHome():vHoyo())+sheet();
+  window.scrollTo(0,y);
+}
+if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');
+if(db.actual&&db.rondas[db.actual]){const r=db.rondas[db.actual],n=Object.values(r.h).filter(x=>x.ok).length;if(n<18){vista='hoyo';ok=''}}
+render();
+</script></body></html>
