@@ -32,6 +32,14 @@ input,select{width:100%;height:48px;font-size:17px;border:1px solid #d1d1d6;bord
 .gr button{height:56px;font-size:22px;background:#f2f2f7}.gr .sel{background:#007aff;color:#fff}.gr .dn{background:#1c1c1e;color:#fff}
 </style></head><body><div id="app"></div>
 <script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js')
+      .then(reg => console.log('Service Worker registrado:', reg))
+      .catch(err => console.error('Error al registrar SW:', err));
+  }
+</script>
+
+<script>
 const CANCHAS={"Palermo GC (Blancas)":[[4,9],[4,7],[4,13],[4,3],[3,11],[5,1],[3,17],[4,15],[4,5],[3,16],[5,14],[4,6],[3,18],[5,2],[4,8],[5,12],[4,4],[4,10]]};
 const KEY='golf_v1';
 let db=JSON.parse(localStorage.getItem(KEY)||'null')||{actual:null,rondas:{},pref:{yo:'',amigo:''}};
