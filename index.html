@@ -1,1243 +1,287 @@
 <!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="utf-8">
-
-<meta name="viewport"
-      content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-
-<meta name="theme-color" content="#ffffff">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-
-<link rel="manifest" href="./manifest.webmanifest">
-
-<title>Golf</title>
-
+<html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#ffffff"><meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.webmanifest"><title>Golf</title>
 <style>
-*{
-  box-sizing:border-box;
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-  -webkit-tap-highlight-color:transparent
-}
-
-html,body{
-  margin:0;
-  background:#fff;
-  color:#1c1c1e;
-  user-select:none
-}
-
-#app{
-  max-width:440px;
-  margin:0 auto;
-  padding:6px 8px 90px
-}
-
-h1{
-  font-size:20px;
-  margin:10px 2px
-}
-
-h2{
-  font-size:14px;
-  margin:16px 2px 6px;
-  text-transform:uppercase;
-  letter-spacing:.4px
-}
-
-.hd{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:4px 2px 8px;
-  border-bottom:1px solid #e5e5ea
-}
-
-.hd b{
-  font-size:15px
-}
-
-.hn{
-  font-size:40px;
-  font-weight:900;
-  line-height:1
-}
-
-.tg{
-  font-size:13px;
-  font-weight:800;
-  line-height:1.15
-}
-
-.run{
-  font-size:13px;
-  font-weight:700;
-  color:#636366;
-  margin:6px 2px
-}
-
-.blk{
-  background:#f2f2f7;
-  border-radius:10px;
-  padding:8px 10px;
-  margin-top:8px
-}
-
-.lbl{
-  font-size:13px;
-  font-weight:800;
-  text-transform:uppercase;
-  margin-bottom:6px
-}
-
-.g2{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px
-}
-
-.box{
-  height:78px;
-  background:#fff;
-  border:1px solid #d1d1d6;
-  border-radius:8px;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  cursor:pointer
-}
-
-.box b{
-  font-size:38px;
-  line-height:1
-}
-
-.box i{
-  font-size:11px;
-  font-style:normal;
-  font-weight:800;
-  color:#636366;
-  margin-top:2px
-}
-
-.box.off{
-  opacity:.4;
-  cursor:default
-}
-
-.tot{
-  background:#e5e5ea;
-  border:1.5px solid #8e8e93;
-  border-radius:10px;
-  padding:8px 10px;
-  margin-top:8px
-}
-
-.bar{
-  position:fixed;
-  left:0;
-  right:0;
-  bottom:0;
-  background:#fff;
-  padding:8px 8px calc(8px + env(safe-area-inset-bottom));
-  display:flex;
-  gap:8px;
-  max-width:440px;
-  margin:0 auto;
-  z-index:8;
-  box-shadow:0 -1px 5px rgba(0,0,0,.08)
-}
-
-button{
-  border:0;
-  border-radius:8px;
-  height:50px;
-  font-size:14px;
-  font-weight:800;
-  background:#e5e5ea;
-  color:#000;
-  padding:0 12px;
-  cursor:pointer
-}
-
-.bar button{
-  flex:1
-}
-
-.bar .go{
-  flex:2;
-  background:#1c1c1e;
-  color:#fff
-}
-
-.pri{
-  background:#1c1c1e;
-  color:#fff
-}
-
-.err{
-  background:#ffe5e5;
-  color:#a00;
-  border-radius:8px;
-  padding:10px;
-  margin:8px 0;
-  font-weight:700;
-  font-size:14px
-}
-
-.ok{
-  background:#e3f6e8;
-  color:#116b2b;
-  border-radius:8px;
-  padding:10px;
-  margin:8px 0;
-  font-weight:700;
-  font-size:14px
-}
-
-input,select{
-  width:100%;
-  height:48px;
-  font-size:17px;
-  border:1px solid #d1d1d6;
-  border-radius:8px;
-  padding:0 10px;
-  background:#fff;
-  margin-bottom:8px;
-  user-select:text
-}
-
-.card{
-  background:#f2f2f7;
-  border-radius:10px;
-  padding:10px;
-  margin-bottom:8px
-}
-
-.card p{
-  margin:0 0 8px;
-  font-size:15px
-}
-
-.row{
-  display:flex;
-  gap:6px;
-  flex-wrap:wrap
-}
-
-.row button{
-  flex:1;
-  min-width:70px;
-  height:44px
-}
-
-.ov{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.5);
-  z-index:9
-}
-
-.sh{
-  position:fixed;
-  left:0;
-  right:0;
-  bottom:0;
-  background:#fff;
-  border-radius:18px 18px 0 0;
-  padding:12px 12px calc(12px + env(safe-area-inset-bottom));
-  max-height:70vh;
-  overflow:auto;
-  max-width:440px;
-  margin:0 auto;
-  z-index:10
-}
-
-.sh h3{
-  margin:0 0 8px;
-  font-size:13px;
-  color:#8e8e93;
-  text-align:center;
-  text-transform:uppercase
-}
-
-.gr{
-  display:grid;
-  grid-template-columns:repeat(5,1fr);
-  gap:8px
-}
-
-.gr button{
-  height:56px;
-  font-size:22px;
-  background:#f2f2f7
-}
-
-.gr .sel{
-  background:#007aff;
-  color:#fff
-}
-
-.gr .dn{
-  background:#1c1c1e;
-  color:#fff
-}
-</style>
-</head>
-
-<body>
-
-<div id="app"></div>
-
+*{box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:#fff;color:#1c1c1e;user-select:none}
+#app{max-width:440px;margin:0 auto;padding:6px 8px 90px}
+h1{font-size:20px;margin:10px 2px;font-weight:900}h2{font-size:14px;margin:16px 2px 6px;text-transform:uppercase;letter-spacing:.4px;font-weight:800}
+.hd{display:flex;align-items:center;justify-content:space-between;padding:4px 2px 8px;border-bottom:1px solid #e5e5ea}
+.hd b{font-size:15px}.hn{font-size:40px;font-weight:900;line-height:1}.tg{font-size:13px;font-weight:800;line-height:1.15}
+.run{font-size:13px;font-weight:700;color:#636366;margin:6px 2px}
+.blk{background:#f2f2f7;border-radius:10px;padding:8px 10px;margin-top:8px}
+.lbl{font-size:13px;font-weight:800;text-transform:uppercase;margin-bottom:6px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.box{height:78px;background:#fff;border:1px solid #d1d1d6;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.box b{font-size:38px;line-height:1}.box i{font-size:11px;font-style:normal;font-weight:800;color:#636366;margin-top:2px}
+.box.off{opacity:.4}.tot{background:#e5e5ea;border:1.5px solid #8e8e93;border-radius:10px;padding:8px 10px;margin-top:8px}
+.bar{position:fixed;left:0;right:0;bottom:0;background:#fff;padding:8px 8px calc(8px + env(safe-area-inset-bottom));display:flex;gap:8px;max-width:440px;margin:0 auto;border-top:1px solid #e5e5ea}
+button{border:0;border-radius:8px;height:50px;font-size:14px;font-weight:800;background:#e5e5ea;color:#000;padding:0 12px}
+.bar button{flex:1}.bar .go{flex:2;background:#1c1c1e;color:#fff}.pri{background:#1c1c1e;color:#fff}
+.err{background:#ffe5e5;color:#a00;border-radius:8px;padding:10px;margin:8px 0;font-weight:700;font-size:14px}
+.ok{background:#e3f6e8;color:#116b2b;border-radius:8px;padding:10px;margin:8px 0;font-weight:700;font-size:14px}
+input,select{width:100%;height:48px;font-size:17px;border:1px solid #d1d1d6;border-radius:8px;padding:0 10px;background:#fff;margin-bottom:8px;user-select:text}
+.card{background:#f2f2f7;border-radius:10px;padding:10px;margin-bottom:8px}.card p{margin:0 0 8px;font-size:15px}
+.row{display:flex;gap:6px}.row button{flex:1;height:44px}
+.mini{flex:0 0 auto!important;height:44px;font-size:12px;padding:0 10px;background:#f2f2f7;color:#8e8e93}
+.tbox{flex:1;background:#1c1c1e;border-radius:12px;padding:14px 8px;text-align:center}
+.tl{color:#a2a2a7;font-size:12px;font-weight:800;text-transform:uppercase}
+.tv{color:#fff;font-size:38px;font-weight:900;line-height:1.2}
+.tvs{color:#d1d1d6;font-size:16px;font-weight:800;margin-top:2px}
+table.tbl{width:100%;border-collapse:collapse;background:#f2f2f7;border-radius:12px;overflow:hidden;margin-top:6px}
+table.tbl th{background:#e5e5ea;font-size:12px;font-weight:800;text-transform:uppercase;padding:8px 6px;text-align:center}
+table.tbl th:first-child{text-align:left}
+table.tbl td{font-size:16px;font-weight:600;padding:8px 6px;text-align:center;border-top:1px solid #e5e5ea}
+table.tbl td:first-child{text-align:left;font-weight:700}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9}
+.sh{position:fixed;left:0;right:0;bottom:0;background:#fff;border-radius:18px 18px 0 0;padding:12px 12px calc(12px + env(safe-area-inset-bottom));max-height:70vh;overflow:auto;max-width:440px;margin:0 auto;z-index:10}
+.sh h3{margin:0 0 8px;font-size:13px;color:#8e8e93;text-align:center;text-transform:uppercase}
+.gr{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.gr button{height:56px;font-size:22px;background:#f2f2f7}.gr .sel{background:#007aff;color:#fff}.gr .dn{background:#1c1c1e;color:#fff}
+</style></head><body><div id="app"></div>
 <script>
-/* =========================================================
-   DATOS DE LA CANCHA
-   ========================================================= */
-
-const CANCHAS = {
-  "Palermo GC (Blancas)": [
-    [4,9],
-    [4,7],
-    [4,13],
-    [4,3],
-    [3,11],
-    [5,1],
-    [3,17],
-    [4,15],
-    [4,5],
-    [3,16],
-    [5,14],
-    [4,6],
-    [3,18],
-    [5,2],
-    [4,8],
-    [5,12],
-    [4,4],
-    [4,10]
-  ]
-};
-
-const KEY = "golf_v1";
-
-let db =
-  JSON.parse(localStorage.getItem(KEY) || "null") ||
-  {
-    actual:null,
-    rondas:{},
-    pref:{
-      yo:"",
-      amigo:""
-    }
-  };
-
-let vista = "home";
-let picker = null;
-let irA = false;
-let msg = "";
-let ok = "";
-
-
-/* =========================================================
-   UTILIDADES
-   ========================================================= */
-
-const $ = s => document.getElementById(s);
-
-const esc = s =>
-  String(s).replace(/[&<>"]/g, c => ({
-    "&":"&amp;",
-    "<":"&lt;",
-    ">":"&gt;",
-    "\"":"&quot;"
-  }[c]));
-
-const signo = n =>
-  n > 0 ? "+" + n :
-  n < 0 ? String(n) :
-  "E";
-
-function save(){
-  try{
-    localStorage.setItem(KEY, JSON.stringify(db));
-  }catch(e){
-    msg = "No se pudo guardar en el celular: " + e.message;
-  }
+const CANCHAS={"Palermo GC (Blancas)":[[4,9],[4,7],[4,13],[4,3],[3,11],[5,1],[3,17],[4,15],[4,5],[3,16],[5,14],[4,6],[3,18],[5,2],[4,8],[5,12],[4,4],[4,10]]};
+const ETQ=['Eagle','Birdie','Par','Bogey','Doble+'];
+const KEY='golf_v1';
+let db=JSON.parse(localStorage.getItem(KEY)||'null')||{actual:null,rondas:{},pref:{yo:'',amigo:''}};
+let vista='home',resumenTipo='ida',picker=null,irA=false,salirSheet=false,msg='',ok='';
+const $=s=>document.getElementById(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const signo=n=>n>0?'+'+n:n<0?String(n):'E';
+const etiqueta=d=>d<=-2?'Eagle':d===-1?'Birdie':d===0?'Par':d===1?'Bogey':'Doble+';
+// Redondeo "al par mas cercano" (banker's rounding), igual que Python round():
+// 16.5 -> 16, no 17. Asi el reparto ida/vuelta del objetivo da los mismos
+// numeros que en la version anterior de la app.
+function redondearMitad(n){
+  const f=Math.floor(n),d=n-f;
+  if(d<0.5)return f;
+  if(d>0.5)return f+1;
+  return f%2===0?f:f+1;
 }
-
-function R(){
-  return db.rondas[db.actual];
+function targetTramo(r,esFinal){
+  const t=r.objetivo||{putt:33,apch:24,s23:28,pen:0};
+  if(esFinal)return t;
+  return {putt:redondearMitad(t.putt/2),apch:redondearMitad(t.apch/2),s23:redondearMitad(t.s23/2),pen:redondearMitad(t.pen/2)};
 }
-
-function par(n){
-  return CANCHAS[R().cancha][n-1][0];
+function sumaCat(hoyos,r,campo){
+  return hoyos.reduce((s,i)=>{
+    let v=r.h[i][campo]||0;
+    if(campo==='s'&&par(i)===3)v=0;
+    return s+v;
+  },0);
 }
-
-function hcp(n){
-  return CANCHAS[R().cancha][n-1][1];
-}
-
-
-/* =========================================================
-   DATOS DE UN HOYO
-   ========================================================= */
-
-function H(n){
-
-  const r = R();
-
-  if(!r.h[n]){
-    r.h[n] = {
-      pp:null,
-      pg:null,
-      ay:null,
-      ag:null,
-      pen:null,
-      s:null,
-      am:null,
-      ok:0
-    };
-  }
-
-  return r.h[n];
-}
-
-
-/* =========================================================
-   CALCULO DEL TOTAL
-   ========================================================= */
-
-function mio(n){
-
-  const h = H(n);
-
-  return (
-    (h.pg || 0) +
-    (h.ag || 0) +
-    (par(n) == 3 ? 0 : (h.s || 0)) +
-    (h.pen || 0)
-  );
-}
-
-
-/* =========================================================
-   NUEVA RONDA
-   ========================================================= */
-
+function save(){try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){msg='No se pudo guardar en el celular: '+e.message}}
+const R=()=>db.rondas[db.actual];
+const par=n=>CANCHAS[R().cancha][n-1][0], hcp=n=>CANCHAS[R().cancha][n-1][1];
+function H(n){const r=R();return r.h[n]||(r.h[n]={pp:0,pg:0,ay:0,ag:0,pen:0,s:0,am:0,ok:0})}
+const mio=(n)=>{const h=H(n);return h.pg+h.ag+(par(n)==3?0:h.s)+h.pen};
+const hayAmigo=()=>!!R().tieneAmigo;
+function hoyosJugados(hasta){const r=R(),res=[];for(let i=1;i<=hasta;i++){if(r.h[i]&&r.h[i].ok)res.push(i)}return res}
 function nueva(){
-
-  const c = $("cancha").value;
-  const yo = $("yo").value.trim() || "YO";
-  const am = $("amigo").value.trim();
-
-  const id = new Date().toISOString();
-
-  db.pref = {
-    yo:yo === "YO" ? "" : yo,
-    amigo:am
+  const c=$('cancha').value,yo=$('yo').value.trim()||'YO',am=$('amigo').value.trim();
+  const objetivo={
+    putt: +$('t_putt').value||0,
+    apch: +$('t_apch').value||0,
+    s23: +$('t_s23').value||0,
+    pen: +$('t_pen').value||0,
   };
-
-  db.rondas[id] = {
-    id:id,
-    fecha:new Date().toISOString(),
-    cancha:c,
-    yo:yo,
-    amigo:am || "AMIGO",
-    hoyo:1,
-    h:{}
-  };
-
-  db.actual = id;
-
-  vista = "hoyo";
-  msg = "";
-  ok = "";
-
-  save();
-  render();
+  const id=new Date().toISOString();
+  db.pref={yo:yo==='YO'?'':yo,amigo:am,objetivo};
+  db.rondas[id]={id,fecha:new Date().toISOString(),cancha:c,yo,amigo:am,tieneAmigo:!!am,objetivo,hoyo:1,h:{}};
+  db.actual=id;vista='hoyo';msg='';ok='';save();render();
 }
-
-
-/* =========================================================
-   CONTINUAR
-   ========================================================= */
-
-function continuar(id){
-
-  db.actual = id;
-  vista = "hoyo";
-  msg = "";
-  ok = "";
-  irA = false;
-
-  save();
-  render();
+function continuar(id){db.actual=id;vista='hoyo';msg='';ok='';irA=false;save();render()}
+function pedirSalir(){salirSheet=true;render()}
+function cancelarSalir(){salirSheet=false;render()}
+async function confirmarSalirGuardando(){
+  if(db.actual)await exportar(db.actual,false);
+  cerrarApp();
 }
-
-
-/* =========================================================
-   SALIR
-   ========================================================= */
-
-function salir(){
-
-  vista = "home";
-  picker = null;
-  irA = false;
-
-  save();
-  render();
+function confirmarSalirSinGuardar(){cerrarApp()}
+function cerrarApp(){
+  salirSheet=false;
+  window.close();
+  // Si seguimos acá, el navegador no dejo cerrar la pestania sola.
+  vista='home';ok='Ya podes cerrar esta pestania. Tus datos quedan guardados en el celular igual.';
+  save();render();
 }
-
-
-/* =========================================================
-   ABRIR SELECTOR
-   ========================================================= */
-
-function pick(k,t,min,max,step){
-
-  picker = {
-    k:k,
-    t:t,
-    min:min,
-    max:max,
-    step:step
-  };
-
-  render();
-}
-
-
-/* =========================================================
-   GUARDAR VALOR SELECCIONADO
-   IMPORTANTE:
-   Es una function normal para que onclick pueda verla.
-   ========================================================= */
-
-function setv(v){
-
-  if(!R() || !picker){
-    return;
-  }
-
-  const h = H(R().hoyo);
-
-  h[picker.k] = Number(v);
-
-  picker = null;
-  msg = "";
-
-  save();
-  render();
-}
-
-
-/* =========================================================
-   IR A UN HOYO
-   ========================================================= */
-
+function pick(k,t,min,max,step){picker={k,t,min,max,step};render()}
+function setv(v){H(R().hoyo)[picker.k]=v;picker=null;msg='';save();render()}
 function ir(n){
-
-  if(!R()){
-    return;
-  }
-
-  R().hoyo = Number(n);
-
-  irA = false;
-  msg = "";
-
-  save();
-  render();
+  const r=R();
+  // Si estabamos jugando y saltamos a corregir OTRO hoyo, recordamos a
+  // donde volver. Si ya habia un salto pendiente, no lo pisamos (asi
+  // varios saltos seguidos vuelven al origen real, no al ultimo salto).
+  if(r.volverA==null && r.hoyo!==n) r.volverA=r.hoyo;
+  r.hoyo=n;irA=false;vista='hoyo';msg='';save();render();
 }
-
-
-/* =========================================================
-   CONFIRMAR HOYO
-   ========================================================= */
-
 function confirmar(){
-
-  const r = R();
-  const n = r.hoyo;
-  const h = H(n);
-  const f = [];
-
-  if(!(h.ag > 0)){
-    f.push("APCH");
-  }
-
-  if(par(n) != 3 && !(h.s > 0)){
-    f.push("S+2+3");
-  }
-
-  if(f.length){
-
-    msg = "No se puede avanzar. Falta: " + f.join(" · ");
-
-    render();
-    return;
-  }
-
-  h.ok = 1;
-  msg = "";
-
-  if(n < 18){
-
-    r.hoyo = n + 1;
-
+  const r=R(),n=r.hoyo,h=H(n),f=[];
+  if(!(h.ag>0))f.push('APCH');
+  if(par(n)!=3&&!(h.s>0))f.push('S+2+3');
+  if(f.length){msg='No se puede avanzar. Falta: '+f.join(' · ');render();return}
+  h.ok=1;msg='';
+  if(r.volverA!=null){
+    r.hoyo=r.volverA;
+    r.volverA=null;
+  }else if(n===9){
+    resumenTipo='ida';vista='resumen';
+  }else if(n===18){
+    resumenTipo='final';vista='resumen';
   }else{
-
-    vista = "home";
-    ok = "Ronda completa. Exportala para tener una copia.";
+    r.hoyo=n+1;
   }
-
-  save();
-  render();
+  save();render();
 }
-
-
-/* =========================================================
-   BORRAR RONDA
-   ========================================================= */
-
-function borrar(id){
-
-  if(confirm(
-    "¿Borrar esta ronda del celular? No se puede deshacer."
-  )){
-
-    delete db.rondas[id];
-
-    if(db.actual === id){
-      db.actual = null;
-    }
-
-    save();
-    render();
-  }
-}
-
-
-/* =========================================================
-   EXPORTAR
-   ========================================================= */
-
-async function exportar(id,compartir){
-
-  const r = db.rondas[id];
-
-  const nom =
-    "ronda_" +
-    r.fecha.slice(0,10) +
-    "_" +
-    r.fecha.slice(11,16).replace(":","") +
-    "_" +
-    r.yo.replace(/\W+/g,"_") +
-    ".json";
-
-  const blob = new Blob(
-    [JSON.stringify(r,null,2)],
-    {type:"application/json"}
-  );
-
-  const file = new File(
-    [blob],
-    nom,
-    {type:"application/json"}
-  );
-
-  if(
-    compartir &&
-    navigator.canShare &&
-    navigator.canShare({files:[file]})
-  ){
-
+function continuarDesdeResumen(){const r=R();r.hoyo=Math.min(r.hoyo+1,18);vista='hoyo';save();render()}
+function verControl(){vista='control';render()}
+function volverAResumen(){vista='resumen';render()}
+function irInicio(){vista='home';save();render()}
+function borrar(id){if(confirm('¿Borrar esta ronda del celular? No se puede deshacer.')){delete db.rondas[id];if(db.actual===id)db.actual=null;save();render()}}
+function importarArchivo(e){
+  const file=e.target.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(ev){
     try{
-
-      await navigator.share({
-        files:[file],
-        title:nom
-      });
-
-      return;
-
-    }catch(e){
-
-      if(e.name === "AbortError"){
-        return;
-      }
+      const r=JSON.parse(ev.target.result);
+      if(!r.id||!r.cancha||!r.h||!CANCHAS[r.cancha])throw new Error('el archivo no tiene el formato esperado');
+      db.rondas[r.id]=r;
+      db.actual=r.id;
+      const n=Object.values(r.h).filter(x=>x.ok).length;
+      vista=n<18?'hoyo':'home';
+      ok=n<18?'':'Ronda importada.';
+      msg='';
+      save();render();
+    }catch(err){
+      msg='No se pudo importar el archivo: '+err.message;
+      render();
     }
-  }
-
-  const url = URL.createObjectURL(blob);
-
-  const a = document.createElement("a");
-
-  a.href = url;
-  a.download = nom;
-
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-
-  setTimeout(() => {
-    URL.revokeObjectURL(url);
-  },4000);
+  };
+  reader.readAsText(file);
+  e.target.value='';
 }
-
-
-/* =========================================================
-   CAJA DE VALORES
-   ========================================================= */
-
-function box(k,t,v,lbl,off){
-
-  if(off){
-
-    return `
-      <div class="box off">
-        <b>${v === null ? "" : v}</b>
-        <i>${lbl}</i>
-      </div>
-    `;
+async function exportar(id,compartir){
+  const r=db.rondas[id],nom='ronda_'+r.fecha.slice(0,10)+'_'+r.fecha.slice(11,16).replace(':','')+'_'+r.yo.replace(/\W+/g,'_')+'.json';
+  const blob=new Blob([JSON.stringify(r,null,2)],{type:'application/json'});
+  const file=new File([blob],nom,{type:'application/json'});
+  if(compartir&&navigator.canShare&&navigator.canShare({files:[file]})){
+    try{await navigator.share({files:[file],title:nom});return}catch(e){if(e.name==='AbortError')return}
   }
-
-  let min = 0;
-  let max = 10;
-  let step = 1;
-
-  if(k === "pp"){
-    max = 40;
-  }
-
-  if(k === "ay"){
-    max = 250;
-    step = 5;
-  }
-
-  if(k === "am"){
-    max = 15;
-  }
-
-  return `
-    <div
-      class="box"
-      onclick="pick('${k}','${t}',${min},${max},${step})"
-    >
-      <b>${v === null ? "" : v}</b>
-      <i>${lbl}</i>
-    </div>
-  `;
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=nom;document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),4000);
 }
-
-
-/* =========================================================
-   PANTALLA PRINCIPAL
-   ========================================================= */
-
+const box=(k,t,v,lbl,off)=>`<div class="box${off?' off':''}" ${off?'':`onclick="pick('${k}','${t}',${k=='pp'?'0,40,1':k=='ay'?'0,250,5':k=='am'?'0,15,1':'0,10,1'})"`}><b>${v||(k=='am'?'—':0)}</b><i>${lbl}</i></div>`;
 function vHome(){
-
-  const ids = Object.keys(db.rondas).sort().reverse();
-
-  return `
-    <h1>Golf</h1>
-
-    ${ok ? `<div class="ok">${esc(ok)}</div>` : ""}
-    ${msg ? `<div class="err">${esc(msg)}</div>` : ""}
-
-    <h2>Nueva ronda</h2>
-
-    <select id="cancha">
-      ${Object.keys(CANCHAS)
-        .map(c => `<option>${esc(c)}</option>`)
-        .join("")}
-    </select>
-
-    <input
-      id="yo"
-      placeholder="Tu nombre"
-      value="${esc(db.pref.yo || "")}"
-    >
-
-    <input
-      id="amigo"
-      placeholder="Amigo (opcional)"
-      value="${esc(db.pref.amigo || "")}"
-    >
-
-    <button
-      class="pri"
-      style="width:100%"
-      onclick="nueva()"
-    >
-      Empezar ronda
-    </button>
-
-    <h2>Rondas guardadas en este celular</h2>
-
-    ${ids.length ? "" : "<p>Todavía no hay rondas.</p>"}
-
-    ${ids.map(id => {
-
-      const r = db.rondas[id];
-
-      const n =
-        Object.values(r.h).filter(x => x.ok).length;
-
-      return `
-        <div class="card">
-
-          <p>
-            <b>
-              ${r.fecha.slice(8,10)}/${r.fecha.slice(5,7)}/${r.fecha.slice(0,4)}
-              ${new Date(r.fecha).toTimeString().slice(0,5)}
-            </b>
-
-            <br>
-
-            ${esc(r.yo)}
-            vs
-            ${esc(r.amigo)}
-
-            ·
-
-            ${esc(r.cancha)}
-
-            <br>
-
-            ${n}/18 hoyos
-
-            ${
-              n < 18
-                ? ` · sigue en el ${r.hoyo}`
-                : ""
-            }
-
-          </p>
-
-          <div class="row">
-
-            <button
-              class="pri"
-              onclick="continuar('${id}')"
-            >
-              ${n < 18 ? "Continuar" : "Abrir"}
-            </button>
-
-            <button
-              onclick="exportar('${id}',true)"
-            >
-              Compartir
-            </button>
-
-            <button
-              onclick="exportar('${id}',false)"
-            >
-              Descargar
-            </button>
-
-            <button
-              onclick="borrar('${id}')"
-            >
-              ✕
-            </button>
-
-          </div>
-
-        </div>
-      `;
-
-    }).join("")}
-  `;
+  const ids=Object.keys(db.rondas).sort().reverse();
+  return `<h1>Golf</h1>${ok?`<div class=ok>${ok}</div>`:''}${msg?`<div class=err>${esc(msg)}</div>`:''}
+  <h2>Nueva ronda</h2><select id=cancha>${Object.keys(CANCHAS).map(c=>`<option>${esc(c)}</option>`).join('')}</select>
+  <input id=yo placeholder="Tu nombre" value="${esc(db.pref.yo||'')}"><input id=amigo placeholder="Amigo (opcional)" value="${esc(db.pref.amigo||'')}">
+  <h2>Tu objetivo (18 hoyos)</h2>
+  <p style="font-size:13px;color:#636366;margin:0 0 8px">Repartilo como quieras. En el resumen del hoyo 9 se usa la mitad de cada valor.</p>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;margin-bottom:8px">
+    <div><label style="font-size:11px;font-weight:800;color:#636366">PUTT</label><input id=t_putt type=number min=0 style="height:44px;padding:0 6px" value="${(db.pref.objetivo&&db.pref.objetivo.putt)??33}"></div>
+    <div><label style="font-size:11px;font-weight:800;color:#636366">APCH</label><input id=t_apch type=number min=0 style="height:44px;padding:0 6px" value="${(db.pref.objetivo&&db.pref.objetivo.apch)??24}"></div>
+    <div><label style="font-size:11px;font-weight:800;color:#636366">S+2+3</label><input id=t_s23 type=number min=0 style="height:44px;padding:0 6px" value="${(db.pref.objetivo&&db.pref.objetivo.s23)??28}"></div>
+    <div><label style="font-size:11px;font-weight:800;color:#636366">PEN</label><input id=t_pen type=number min=0 style="height:44px;padding:0 6px" value="${(db.pref.objetivo&&db.pref.objetivo.pen)??0}"></div>
+  </div>
+  <button class=pri style="width:100%" onclick="nueva()">Empezar ronda</button>
+  <h2>Rondas guardadas en este celular</h2>${ids.length?'':'<p>Todavía no hay rondas.</p>'}
+  ${ids.map(id=>{const r=db.rondas[id],n=Object.values(r.h).filter(x=>x.ok).length;
+  return `<div class=card><p><b>${r.fecha.slice(8,10)}/${r.fecha.slice(5,7)}/${r.fecha.slice(0,4)} ${new Date(r.fecha).toTimeString().slice(0,5)}</b><br>${esc(r.yo)}${r.tieneAmigo?' vs '+esc(r.amigo):''} · ${esc(r.cancha)}<br>${n}/18 hoyos${n<18&&n>0?` · sigue en el ${r.hoyo}`:''}${n>=18?' · completa':''}</p>
+  <div class=row><button class=pri onclick="continuar('${id}')">${n<18?'Continuar':'Abrir'}</button><button onclick="exportar('${id}',true)">Compartir</button><button onclick="exportar('${id}',false)">Descargar</button><button onclick="borrar('${id}')">✕</button></div></div>`}).join('')}
+  <h2>Restaurar desde un archivo</h2>
+  <p style="font-size:13px;color:#636366;margin:0 0 8px">Si el celular se traba o perdiste una ronda, elegi un .json que hayas exportado antes.</p>
+  <input type=file id=importFile accept="application/json" style="display:none" onchange="importarArchivo(event)">
+  <button style="width:100%;margin-bottom:8px" onclick="document.getElementById('importFile').click()">Importar ronda (.json)</button>
+  <button class=mini style="width:100%" onclick="pedirSalir()">Salir</button>`;
 }
-
-
-/* =========================================================
-   PANTALLA DEL HOYO
-   ========================================================= */
-
 function vHoyo(){
-
-  const r = R();
-  const n = r.hoyo;
-  const h = H(n);
-  const p = par(n);
-
-  let tot = 0;
-  let pp = 0;
-
-  for(let i=1;i<=18;i++){
-
-    const x = r.h[i];
-
-    if(x && x.ok){
-
-      tot += mio(i);
-      pp += par(i);
-    }
-  }
-
-  return `
-    <div class="hd">
-
-      <b>${esc(r.cancha)}</b>
-
-      <span class="hn">${n}</span>
-
-      <span class="tg">
-        PAR ${p}<br>
-        HCP ${hcp(n)}
-      </span>
-
-    </div>
-
-    <div class="run">
-
-      ${esc(r.yo)}:
-
-      ${tot} golpes
-
-      (${signo(tot-pp)})
-
-      en
-
-      ${Object.values(r.h).filter(x => x.ok).length}
-      hoyos
-
-      ${h.ok ? " · hoyo ya confirmado" : ""}
-
-    </div>
-
-    ${msg ? `<div class="err">${esc(msg)}</div>` : ""}
-
-    <div class="blk">
-
-      <div class="lbl">⛳ Putts</div>
-
-      <div class="g2">
-
-        ${box(
-          "pp",
-          "PASOS PUTT",
-          h.pp,
-          "PASOS"
-        )}
-
-        ${box(
-          "pg",
-          "GOLPES PUTT",
-          h.pg,
-          "GOLPES"
-        )}
-
-      </div>
-
-    </div>
-
-
-    <div class="blk">
-
-      <div class="lbl">🎯 APCH</div>
-
-      <div class="g2">
-
-        ${box(
-          "ay",
-          "YARDAS APCH",
-          h.ay,
-          "YARDAS"
-        )}
-
-        ${box(
-          "ag",
-          "GOLPES APCH",
-          h.ag,
-          "GOLPES"
-        )}
-
-      </div>
-
-    </div>
-
-
-    <div class="blk">
-
-      <div class="g2">
-
-        <div class="lbl">
-          Penalties
-        </div>
-
-        <div class="lbl">
-          🏌️ S+2+3
-        </div>
-
-      </div>
-
-      <div class="g2">
-
-        ${box(
-          "pen",
-          "PENALTIES",
-          h.pen,
-          "GOLPES NETOS"
-        )}
-
-        ${box(
-          "s",
-          "GOLPES S+2+3",
-          p == 3 ? 0 : h.s,
-          "GOLPES",
-          p == 3
-        )}
-
-      </div>
-
-    </div>
-
-
-    <div class="tot">
-
-      <div class="g2">
-
-        <div>
-
-          <div class="lbl">
-            👥 ${esc(r.amigo)}
-          </div>
-
-          ${box(
-            "am",
-            "TOTAL " + esc(r.amigo),
-            h.am,
-            "TOTAL (opcional)"
-          )}
-
-        </div>
-
-
-        <div>
-
-          <div class="lbl">
-            👤 ${esc(r.yo)}
-          </div>
-
-          <div class="box">
-
-            <b>${mio(n)}</b>
-
-            <i>TOTAL</i>
-
-          </div>
-
-        </div>
-
-      </div>
-
-    </div>
-
-
-    <div class="bar">
-
-      <button onclick="salir()">
-        ✕ SALIR
-      </button>
-
-      <button onclick="irA=true;render()">
-        IR A…
-      </button>
-
-      <button
-        class="go"
-        onclick="confirmar()"
-      >
-        CONFIRMAR Y AVANZAR ➔
-      </button>
-
-    </div>
-  `;
+  const r=R(),n=r.hoyo,h=H(n),p=par(n);
+  let tot=0,totA=0,pp=0,jugados=0;
+  for(let i=1;i<=18;i++){const x=r.h[i];if(x&&x.ok){tot+=mio(i);pp+=par(i);jugados++;if(r.tieneAmigo)totA+=(x.am||0)}}
+  return `<div class=hd><b>${esc(r.cancha)}</b><span class=hn>${n}</span><span class=tg>PAR ${p}<br>HCP ${hcp(n)}</span></div>
+  <div class=run>${esc(r.yo)}: ${tot} (${signo(tot-pp)})${r.tieneAmigo?` · ${esc(r.amigo)}: ${totA} (${signo(totA-pp)})`:''} · ${jugados}/18${h.ok?' · hoyo ya confirmado':''}</div>
+  ${r.volverA!=null?`<div class=ok>Corrigiendo el hoyo ${n}. Al confirmar, volves al hoyo ${r.volverA}.</div>`:''}
+  ${msg?`<div class=err>${esc(msg)}</div>`:''}
+  <div class=blk><div class=lbl>⛳ Putts</div><div class=g2>${box('pp','PASOS PUTT',h.pp,'PASOS')}${box('pg','GOLPES PUTT',h.pg,'GOLPES')}</div></div>
+  <div class=blk><div class=lbl>🎯 APCH</div><div class=g2>${box('ay','YARDAS APCH',h.ay,'YARDAS')}${box('ag','GOLPES APCH',h.ag,'GOLPES')}</div></div>
+  <div class=blk><div class=g2><div class=lbl>Penalties</div><div class=lbl>🏌️ S+2+3</div></div><div class=g2>${box('pen','PENALTIES',h.pen,'GOLPES NETOS')}${box('s','GOLPES S+2+3',p==3?0:h.s,'GOLPES',p==3)}</div></div>
+  <div class=tot><div class=g2>
+  ${r.tieneAmigo?`<div><div class=lbl>👥 ${esc(r.amigo)}</div>${box('am','TOTAL '+esc(r.amigo),h.am,'TOTAL')}</div>`:'<div></div>'}
+  <div><div class=lbl>👤 ${esc(r.yo)}</div><div class=box><b>${mio(n)}</b><i>TOTAL</i></div></div>
+  </div></div>
+  <div class=bar><button onclick="pedirSalir()">✕ SALIR</button><button onclick="irA=true;render()">IR A…</button><button class=go onclick="confirmar()">CONFIRMAR Y AVANZAR ➔</button></div>`;
 }
+function vResumen(){
+  const r=R(),hasta=resumenTipo==='ida'?9:18,hoyos=hoyosJugados(hasta),amigo=hayAmigo(),esFinal=hasta>=18;
+  const parTot=hoyos.reduce((s,i)=>s+par(i),0);
+  const mioTot=hoyos.reduce((s,i)=>s+mio(i),0);
+  const amigoTot=amigo?hoyos.reduce((s,i)=>s+(r.h[i].am||0),0):0;
+  const resM={},resA={};ETQ.forEach(e=>{resM[e]=0;resA[e]=0});
+  hoyos.forEach(i=>{resM[etiqueta(mio(i)-par(i))]++;if(amigo)resA[etiqueta((r.h[i].am||0)-par(i))]++});
+  const filasResultados=ETQ.map(e=>`<tr><td>${e}</td>${amigo?`<td>${resA[e]}</td>`:''}<td>${resM[e]}</td></tr>`).join('');
 
+  const target=targetTramo(r,esFinal);
+  const realPutt=sumaCat(hoyos,r,'pg'),realApch=sumaCat(hoyos,r,'ag'),realS23=sumaCat(hoyos,r,'s'),realPen=sumaCat(hoyos,r,'pen');
+  const targetTotal=target.putt+target.apch+target.s23+target.pen;
+  const filasObjetivo=[['PUTT',realPutt,target.putt],['APCH',realApch,target.apch],['S+2+3',realS23,target.s23],['PEN',realPen,target.pen],['TOTAL',mioTot,targetTotal]]
+    .map(([cat,real,obj])=>`<tr><td>${cat}</td><td>${real}</td><td>${obj}</td><td>${signo(real-obj)}</td></tr>`).join('');
 
-/* =========================================================
-   SELECTOR INFERIOR
-   ========================================================= */
-
+  return `<h1>${resumenTipo==='ida'?'RESUMEN IDA':'RESUMEN FINAL'}</h1><div class=run>${esc(r.cancha)} · ${hoyos.length} hoyos cargados</div>
+  <div class=g2 style="margin-top:10px">
+  ${amigo?`<div class=tbox><div class=tl>${esc(r.amigo)}</div><div class=tv>${amigoTot}</div><div class=tvs>${signo(amigoTot-parTot)}</div></div>`:''}
+  <div class=tbox><div class=tl>${esc(r.yo)}</div><div class=tv>${mioTot}</div><div class=tvs>${signo(mioTot-parTot)}</div></div>
+  </div>
+  <h2>Resultados</h2><table class=tbl><tr><th>Tipo</th>${amigo?`<th>${esc(r.amigo)}</th>`:''}<th>${esc(r.yo)}</th></tr>${filasResultados}</table>
+  <h2>Tu juego vs. objetivo</h2><table class=tbl><tr><th></th><th>${esc(r.yo)}</th><th>Target</th><th>Diff</th></tr>${filasObjetivo}</table>
+  <div class=row style="margin-top:14px">
+    <button class=mini onclick="pedirSalir()">Salir</button>
+    <button onclick="verControl()">Control</button>
+    ${esFinal?`<button class=go style="flex:2" onclick="exportar(db.actual,true)">Exportar</button>`:`<button class=go style="flex:2" onclick="continuarDesdeResumen()">Continuar →</button>`}
+  </div>
+  ${esFinal?`<button style="width:100%;margin-top:8px" onclick="irInicio()">Volver al inicio</button>`:''}`;
+}
+function vControl(){
+  const r=R(),hasta=resumenTipo==='ida'?9:18,hoyos=hoyosJugados(hasta),amigo=hayAmigo();
+  const filas=hoyos.map(i=>`<tr><td><b>${i}</b></td><td><b>${par(i)}</b></td>${amigo?`<td><b>${r.h[i].am||0}</b></td>`:''}<td><b>${mio(i)}</b></td></tr>`).join('');
+  return `<h1>CONTROL POR HOYO</h1><div class=run>${esc(r.cancha)}</div>
+  <table class=tbl><tr><th>Hoyo</th><th>Par</th>${amigo?`<th>${esc(r.amigo)}</th>`:''}<th>${esc(r.yo)}</th></tr>${filas}</table>
+  <div class=row style="margin-top:10px">
+    <button class=mini onclick="pedirSalir()">Salir</button>
+    <button class=pri style="flex:2" onclick="volverAResumen()">← Volver</button>
+  </div>
+  <button style="width:100%;margin-top:8px" onclick="irInicio()">Volver al inicio</button>`;
+}
 function sheet(){
-
-  if(irA){
-
-    const r = R();
-
-    return `
-      <div
-        class="ov"
-        onclick="irA=false;render()"
-      ></div>
-
-      <div class="sh">
-
-        <h3>Ir al hoyo</h3>
-
-        <div class="gr">
-
-          ${[...Array(18)].map((_,i) => {
-
-            const num = i + 1;
-
-            return `
-              <button
-                class="${
-                  num == r.hoyo
-                    ? "sel"
-                    : (r.h[num] && r.h[num].ok)
-                      ? "dn"
-                      : ""
-                }"
-                onclick="ir(${num})"
-              >
-                ${num}
-              </button>
-            `;
-
-          }).join("")}
-
-        </div>
-
-      </div>
-    `;
+  if(salirSheet){
+    return `<div class=ov onclick="cancelarSalir()"></div><div class=sh><h3>¿Guardar la ronda?</h3>
+    <p style="font-size:14px;color:#636366;margin:0 0 10px">Tus datos ya quedan guardados en el celular igual. Guardar acá te deja ademas una copia en archivo, para tener un respaldo aparte.</p>
+    <button class=pri style="width:100%;margin-bottom:8px" onclick="confirmarSalirGuardando()">Sí, guardar copia y salir</button>
+    <button style="width:100%;margin-bottom:8px" onclick="confirmarSalirSinGuardar()">No, salir sin copia</button>
+    <button style="width:100%" onclick="cancelarSalir()">Cancelar</button>
+    </div>`;
   }
-
-
-  if(picker){
-
-    const cur = H(R().hoyo)[picker.k];
-
-    const b = [];
-
-    for(
-      let v = picker.min;
-      v <= picker.max;
-      v += picker.step
-    ){
-
-      b.push(`
-        <button
-          class="${v == cur ? "sel" : ""}"
-          onclick="setv(${v})"
-        >
-          ${v}
-        </button>
-      `);
-    }
-
-    return `
-      <div
-        class="ov"
-        onclick="picker=null;render()"
-      ></div>
-
-      <div class="sh">
-
-        <h3>${esc(picker.t)}</h3>
-
-        <div class="gr">
-          ${b.join("")}
-        </div>
-
-      </div>
-    `;
-  }
-
-  return "";
+  if(irA){const r=R();return `<div class=ov onclick="irA=false;render()"></div><div class=sh><h3>Ir al hoyo</h3><div class=gr>${[...Array(18)].map((_,i)=>`<button class="${i+1==r.hoyo?'sel':(r.h[i+1]&&r.h[i+1].ok)?'dn':''}" onclick="ir(${i+1})">${i+1}</button>`).join('')}</div></div>`}
+  if(picker){const cur=H(R().hoyo)[picker.k],b=[];for(let v=picker.min;v<=picker.max;v+=picker.step)b.push(`<button class="${v==cur?'sel':''}" onclick="setv(${v})">${v}</button>`);
+    return `<div class=ov onclick="picker=null;render()"></div><div class=sh><h3>${picker.t}</h3><div class=gr>${b.join('')}</div></div>`}
+  return '';
 }
-
-
-/* =========================================================
-   RENDER
-   ========================================================= */
-
 function render(){
-
-  if(vista === "hoyo" && !R()){
-    vista = "home";
-  }
-
-  const y = window.scrollY;
-
-  $("app").innerHTML =
-    (vista === "home" ? vHome() : vHoyo()) +
-    sheet();
-
+  if((vista=='hoyo'||vista=='resumen'||vista=='control')&&!R())vista='home';
+  const y=window.scrollY;
+  let html;
+  if(vista=='home')html=vHome();
+  else if(vista=='hoyo')html=vHoyo();
+  else if(vista=='resumen')html=vResumen();
+  else html=vControl();
+  $('app').innerHTML=html+sheet();
   window.scrollTo(0,y);
 }
-
-
-/* =========================================================
-   INICIO
-   ========================================================= */
-
-if(
-  navigator.storage &&
-  navigator.storage.persist
-){
-  navigator.storage.persist().catch(() => {});
-}
-
-
-/*
-  Registramos el Service Worker solamente una vez.
-*/
-
-if("serviceWorker" in navigator){
-
-  navigator.serviceWorker
-    .register("./sw.js")
-    .then(reg => {
-
-      console.log(
-        "Service Worker registrado:",
-        reg.scope
-      );
-
-    })
-    .catch(err => {
-
-      console.error(
-        "Error al registrar Service Worker:",
-        err
-      );
-
-    });
-}
-
-
-/*
-  Si había una ronda incompleta,
-  volvemos directamente a ella.
-*/
-
-if(
-  db.actual &&
-  db.rondas[db.actual]
-){
-
-  const r = db.rondas[db.actual];
-
-  const n =
-    Object.values(r.h).filter(x => x.ok).length;
-
-  if(n < 18){
-    vista = "hoyo";
-    ok = "";
-  }
-}
-
+if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');
+if(db.actual&&db.rondas[db.actual]){const n=Object.values(db.rondas[db.actual].h).filter(x=>x.ok).length;if(n<18){vista='hoyo'}}
 render();
-
-</script>
-
-</body>
-</html>
+</script></body></html>
