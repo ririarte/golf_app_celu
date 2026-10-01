@@ -42,7 +42,12 @@ table.tbl td:first-child{text-align:left;font-weight:700}
 .gr button{height:56px;font-size:22px;background:#f2f2f7}.gr .sel{background:#007aff;color:#fff}.gr .dn{background:#1c1c1e;color:#fff}
 </style></head><body><div id="app"></div>
 <script>
-const CANCHAS={"Palermo GC (Blancas)":[[4,9],[4,7],[4,13],[4,3],[3,11],[5,1],[3,17],[4,15],[4,5],[3,16],[5,14],[4,6],[3,18],[5,2],[4,8],[5,12],[4,4],[4,10]]};
+const CANCHAS={
+  "Palermo GC (Blancas)":[[4,9],[4,7],[4,13],[4,3],[3,11],[5,1],[3,17],[4,15],[4,5],[3,16],[5,14],[4,6],[3,18],[5,2],[4,8],[5,12],[4,4],[4,10]],
+  "CUBA Fátima (Blanca)":[[5,5],[3,15],[4,1],[5,11],[4,9],[4,7],[3,17],[4,3],[4,13],[4,12],[5,6],[4,4],[4,8],[3,16],[4,2],[4,10],[3,18],[5,14]],
+  "San Patricio (Azules)":[[4,7],[4,5],[3,17],[5,11],[4,9],[5,1],[4,3],[3,15],[4,13],[5,6],[3,14],[5,2],[4,12],[4,8],[3,18],[4,16],[4,10],[4,4]],
+  "Martindale (Blancas)":[[4,7],[4,5],[5,1],[3,15],[5,3],[3,17],[4,11],[4,13],[4,9],[4,12],[3,18],[5,2],[4,4],[4,14],[3,16],[4,6],[5,8],[4,10]],
+};
 const ETQ=['Eagle','Birdie','Par','Bogey','Doble+'];
 const KEY='golf_v1';
 let db=JSON.parse(localStorage.getItem(KEY)||'null')||{actual:null,rondas:{},pref:{yo:'',amigo:''}};
