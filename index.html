@@ -277,7 +277,7 @@ function vHome(){
   <h2>Rondas guardadas en este celular</h2>${ids.length?'':'<p>Todavía no hay rondas.</p>'}
   ${ids.map(id=>{const r=db.rondas[id],n=Object.values(r.h).filter(x=>x.ok).length;
   return `<div class=card><p><b>${r.fecha.slice(8,10)}/${r.fecha.slice(5,7)}/${r.fecha.slice(0,4)} ${new Date(r.fecha).toTimeString().slice(0,5)}</b><br>${esc(r.yo)}${r.tieneAmigo?' vs '+esc(r.amigo):''} · ${esc(r.cancha)}<br>${n}/18 hoyos${n<18&&n>0?` · sigue en el ${r.hoyo}`:''}${n>=18?' · completa':''}</p>
-  <div class=row><button class=pri onclick="continuar('${id}')">${n<18?'Continuar':'Abrir'}</button><button onclick="abrirEditarObj('${id}')">🎯</button><button onclick="exportar('${id}',true)">Compartir</button><button onclick="exportar('${id}',false)">Descargar</button><button onclick="borrar('${id}')">✕</button></div></div>`}).join('')}
+  <div class=row><button class=pri onclick="continuar('${id}')">${n<18?'Continuar':'Abrir'}</button><button onclick="exportar('${id}',true)">Compartir</button><button onclick="exportar('${id}',false)">Descargar</button><button onclick="borrar('${id}')">✕</button></div></div>`}).join('')}
   <h2>Restaurar desde un archivo</h2>
   <p style="font-size:13px;color:#636366;margin:0 0 8px">Si el celular se traba o perdiste una ronda, elegi un .json que hayas exportado antes.</p>
   <input type=file id=importFile accept="application/json" style="display:none" onchange="importarArchivo(event)">
