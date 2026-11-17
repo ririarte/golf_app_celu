@@ -78,6 +78,7 @@ if(!db.tips){
 let vista='home',
     resumenTipo='ida',
     picker=null,
+    apchPicker=null,
     irA=false,
     salirSheet=false,
     editarObjetivosId=null,
@@ -109,7 +110,22 @@ function sumaCat(hoyos,r,campo){
 function save(){try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){msg='No se pudo guardar en el celular: '+e.message}}
 const R=()=>db.rondas[db.actual];
 const par=n=>CANCHAS[R().cancha][n-1][0], hcp=n=>CANCHAS[R().cancha][n-1][1];
-function H(n){const r=R();return r.h[n]||(r.h[n]={pp:0,pg:0,ay:0,ag:0,pen:0,s:0,am:0,ok:0})}
+
+function H(n){
+  const r=R();
+  return r.h[n]||(r.h[n]={
+    pp:0,
+    pg:0,
+    ay:0,
+    ag:0,
+    apchFlags:[],
+    pen:0,
+    s:0,
+    am:0,
+    ok:0
+  })
+}
+
 const mio=(n)=>{const h=H(n);return h.pg+h.ag+(par(n)==3?0:h.s)+h.pen};
 function hayAmigo(){const r=R();return !!(r.amigo&&r.tieneAmigo)}
 function hoyosJugados(hasta){const r=R(),res=[];for(let i=1;i<=hasta;i++){if(r.h[i]&&r.h[i].ok)res.push(i)}return res}
@@ -149,6 +165,54 @@ function cerrarApp(){
 }
 function pick(k,t,min,max,step){picker={k,t,min,max,step};render()}
 function setv(v){H(R().hoyo)[picker.k]=v;picker=null;msg='';save();render()}
+function abrirApch(){
+  const h=H(R().hoyo);
+
+  apchPicker={
+    golpes:h.ag||1,
+    flags:[...(h.apchFlags||[])]
+  };
+
+  render();
+}
+
+function toggleApchFlag(f){
+  const i=apchPicker.flags.indexOf(f);
+
+  if(i>=0){
+    apchPicker.flags.splice(i,1);
+  }else{
+    apchPicker.flags.push(f);
+  }
+
+  if(apchPicker.golpes===1){
+    apchPicker.flags=apchPicker.flags.filter(x=>x!=='BKR');
+  }
+
+  render();
+}
+
+function setApchGolpes(v){
+  apchPicker.golpes=v;
+
+  if(v===1){
+    apchPicker.flags=apchPicker.flags.filter(x=>x!=='BKR');
+  }
+
+  render();
+}
+
+function guardarApch(){
+  const h=H(R().hoyo);
+
+  h.ag=apchPicker.golpes;
+  h.apchFlags=[...apchPicker.flags];
+
+  apchPicker=null;
+
+  save();
+  render();
+}
 function abrirTips(){
   vistaAnterior=vista;
   vista='tips';
@@ -259,7 +323,11 @@ async function exportar(id,compartir){
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=nom;document.body.appendChild(a);a.click();a.remove();
   setTimeout(()=>URL.revokeObjectURL(a.href),4000);
 }
-const box=(k,t,v,lbl,off)=>`<div class="box${off?' off':''}" ${off?'':`onclick="pick('${k}','${t}',${k=='pp'?'0,40,1':k=='ay'?'0,250,5':k=='am'?'0,15,1':'0,10,1'})"`}><b>${v||(k=='am'?'—':0)}</b><i>${lbl}</i></div>`;
+const box=(k,t,v,lbl,off)=>`<div class="box${off?' off':''}" ${off?'':`onclick="${
+  k=='ag'
+    ? 'abrirApch()'
+    : `pick('${k}','${t}',${k=='pp'?'0,40,1':k=='ay'?'0,250,5':k=='am'?'0,15,1':'0,10,1'})`
+}"
 function vHome(){
   const ids=Object.keys(db.rondas).sort().reverse();
   return `<h1>Golf</h1>${ok?`<div class=ok>${ok}</div>`:''}${msg?`<div class=err>${esc(msg)}</div>`:''}
@@ -389,9 +457,53 @@ function sheet(){
     </div>`;
   }
   if(irA){const r=R();return `<div class=ov onclick="irA=false;render()"></div><div class=sh><h3>Ir al hoyo</h3><div class=gr>${[...Array(18)].map((_,i)=>`<button class="${i+1==r.hoyo?'sel':(r.h[i+1]&&r.h[i+1].ok)?'dn':''}" onclick="ir(${i+1})">${i+1}</button>`).join('')}</div></div>`}
-  if(picker){const cur=H(R().hoyo)[picker.k],b=[];for(let v=picker.min;v<=picker.max;v+=picker.step)b.push(`<button class="${v==cur?'sel':''}" onclick="setv(${v})">${v}</button>`);
-    return `<div class=ov onclick="picker=null;render()"></div><div class=sh><h3>${picker.t}</h3><div class=gr>${b.join('')}</div></div>`}
-  return '';
+if(apchPicker){
+  const golpes=[1,2,3,4,5];
+  const flags=['BKR','LAR','COR','IZQ','DER'];
+
+  return `
+  <div class=ov></div>
+  <div class=sh>
+    <h3>Approach</h3>
+
+    <div class=gr>
+      ${golpes.map(v=>`
+        <button
+          class="${apchPicker.golpes===v?'sel':''}"
+          onclick="setApchGolpes(${v})">
+          ${v}
+        </button>
+      `).join('')}
+    </div>
+
+    <div style="height:10px"></div>
+
+    <div class=gr>
+      ${flags.map(f=>`
+        <button
+          class="${apchPicker.flags.includes(f)?'dn':''}"
+          onclick="toggleApchFlag('${f}')"
+          ${(apchPicker.golpes===1 && f==='BKR')?'disabled':''}>
+          ${f}
+        </button>
+      `).join('')}
+    </div>
+
+    <button
+      class="pri"
+      style="width:100%;margin-top:10px"
+      onclick="guardarApch()">
+      ACEPTAR
+    </button>
+  </div>`;
+}
+
+if(picker){
+  const cur=H(R().hoyo)[picker.k],b=[];
+  for(let v=picker.min;v<=picker.max;v+=picker.step)
+    b.push(`<button class="${v==cur?'sel':''}" onclick="setv(${v})">${v}</button>`);
+
+  return `<div class=ov onclick="picker=null;render()"></div><div class=sh><h3>${picker.t}</h3><div class=gr>${b.join('')}</div></div>`;
 }
 function render(){
   if((vista=='hoyo'||vista=='resumen'||vista=='control'||vista=='tips')&&!R()) vista='home';
