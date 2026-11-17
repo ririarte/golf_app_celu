@@ -40,6 +40,10 @@ table.tbl td:first-child{text-align:left;font-weight:700}
 .sh h3{margin:0 0 8px;font-size:13px;color:#8e8e93;text-align:center;text-transform:uppercase}
 .gr{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
 .gr button{height:56px;font-size:22px;background:#f2f2f7}.gr .sel{background:#007aff;color:#fff}.gr .dn{background:#1c1c1e;color:#fff}
+.apch-flags{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:8px}
+.apch-flags button{height:44px;font-size:12px;background:#fff;border:1px solid #d1d1d6;color:#1c1c1e}
+.apch-flags button.sel{background:#007aff;color:#fff;border-color:#007aff}
+.apch-flags button.off{opacity:.4}
 </style></head><body><div id="app"></div>
 <script>
 const CANCHAS={
@@ -53,6 +57,7 @@ const CANCHAS={
   "Ituzaingo (Blancas)":[[4,13],[5,1],[4,15],[3,17],[4,3],[4,11],[4,5],[4,9],[3,7],[4,2],[4,8],[3,6],[5,4],[4,12],[4,14],[5,6],[3,18],[4,10]],
 };
 const ETQ=['Eagle','Birdie','Par','Bogey','Doble+'];
+const APCH_FLAGS=['BKR','LAR','COR','IZQ','DER'];
 const KEY='golf_v1';
 let db=JSON.parse(localStorage.getItem(KEY)||'null')||{
   actual:null,
@@ -67,6 +72,7 @@ let db=JSON.parse(localStorage.getItem(KEY)||'null')||{
 };
 
 
+
 if(!db.tips){
   db.tips={
     rutina:['','','','',''],
@@ -78,7 +84,6 @@ if(!db.tips){
 let vista='home',
     resumenTipo='ida',
     picker=null,
-    apchPicker=null,
     irA=false,
     salirSheet=false,
     editarObjetivosId=null,
@@ -110,22 +115,7 @@ function sumaCat(hoyos,r,campo){
 function save(){try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){msg='No se pudo guardar en el celular: '+e.message}}
 const R=()=>db.rondas[db.actual];
 const par=n=>CANCHAS[R().cancha][n-1][0], hcp=n=>CANCHAS[R().cancha][n-1][1];
-
-function H(n){
-  const r=R();
-  return r.h[n]||(r.h[n]={
-    pp:0,
-    pg:0,
-    ay:0,
-    ag:0,
-    apchFlags:[],
-    pen:0,
-    s:0,
-    am:0,
-    ok:0
-  })
-}
-
+function H(n){const r=R();return r.h[n]||(r.h[n]={pp:0,pg:0,ay:0,ag:0,pen:0,s:0,am:0,ok:0,apchFlags:[]})}
 const mio=(n)=>{const h=H(n);return h.pg+h.ag+(par(n)==3?0:h.s)+h.pen};
 function hayAmigo(){const r=R();return !!(r.amigo&&r.tieneAmigo)}
 function hoyosJugados(hasta){const r=R(),res=[];for(let i=1;i<=hasta;i++){if(r.h[i]&&r.h[i].ok)res.push(i)}return res}
@@ -165,59 +155,12 @@ function cerrarApp(){
 }
 function pick(k,t,min,max,step){picker={k,t,min,max,step};render()}
 function setv(v){H(R().hoyo)[picker.k]=v;picker=null;msg='';save();render()}
-function abrirApch(){
-  const h=H(R().hoyo);
-
-  apchPicker={
-    golpes:h.ag||1,
-    flags:[...(h.apchFlags||[])]
-  };
-
-  render();
-}
-
-function toggleApchFlag(f){
-  const i=apchPicker.flags.indexOf(f);
-
-  if(i>=0){
-    apchPicker.flags.splice(i,1);
-  }else{
-    apchPicker.flags.push(f);
-  }
-
-  if(apchPicker.golpes===1){
-    apchPicker.flags=apchPicker.flags.filter(x=>x!=='BKR');
-  }
-
-  render();
-}
-
-function setApchGolpes(v){
-  apchPicker.golpes=v;
-
-  if(v===1){
-    apchPicker.flags=apchPicker.flags.filter(x=>x!=='BKR');
-  }
-
-  render();
-}
-
-function guardarApch(){
-  const h=H(R().hoyo);
-
-  h.ag=apchPicker.golpes;
-  h.apchFlags=[...apchPicker.flags];
-
-  apchPicker=null;
-
-  save();
-  render();
-}
 function abrirTips(){
   vistaAnterior=vista;
   vista='tips';
   render();
 }
+
 
 
 function volverTips(){
@@ -227,9 +170,35 @@ function volverTips(){
 }
 
 
+
 function actualizarTip(cat,i,val){
   db.tips[cat][i]=val;
   save();
+}
+function setApchGolpes(v){
+  const h=H(R().hoyo);
+  h.ag=v;
+  if(v===1){
+    if(!Array.isArray(h.apchFlags))h.apchFlags=[];
+    h.apchFlags=h.apchFlags.filter(f=>f!=='BKR');
+  }
+  save();
+  render();
+}
+function toggleApchFlag(flag){
+  const h=H(R().hoyo);
+  if(!Array.isArray(h.apchFlags))h.apchFlags=[];
+  if(flag==='BKR'&&h.ag===1){
+    h.apchFlags=h.apchFlags.filter(f=>f!=='BKR');
+    save();
+    render();
+    return;
+  }
+  const i=h.apchFlags.indexOf(flag);
+  if(i===-1)h.apchFlags.push(flag);
+  else h.apchFlags.splice(i,1);
+  save();
+  render();
 }
 function ir(n){
   const r=R();
@@ -266,10 +235,12 @@ function abrirEditarObj(id){
   render();
 }
 
+
 function cancelarEditarObj(){
   editarObjetivosId=null;
   render();
 }
+
 
 function guardarObjetivos(){
   const r=db.rondas[editarObjetivosId];
@@ -323,11 +294,15 @@ async function exportar(id,compartir){
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=nom;document.body.appendChild(a);a.click();a.remove();
   setTimeout(()=>URL.revokeObjectURL(a.href),4000);
 }
-const box=(k,t,v,lbl,off)=>`<div class="box${off?' off':''}" ${off?'':`onclick="${
-  k=='ag'
-    ? 'abrirApch()'
-    : `pick('${k}','${t}',${k=='pp'?'0,40,1':k=='ay'?'0,250,5':k=='am'?'0,15,1':'0,10,1'})`
-}"
+const box=(k,t,v,lbl,off)=>`<div class="box${off?' off':''}" ${off?'':`onclick="pick('${k}','${t}',${k=='pp'?'0,40,1':k=='ay'?'0,250,5':k=='am'?'0,15,1':'0,10,1'})"`}><b>${v||(k=='am'?'—':0)}</b><i>${lbl}</i></div>`;
+function apchFlagsHtml(h){
+  const flags=Array.isArray(h.apchFlags)?h.apchFlags:[];
+  return `<div class=apch-flags>${APCH_FLAGS.map(f=>{
+    const off=f==='BKR'&&h.ag===1;
+    const sel=flags.includes(f);
+    return `<button class="${sel?'sel':''}${off?' off':''}" ${off?'disabled':''} onclick="toggleApchFlag('${f}')">${f}</button>`;
+  }).join('')}</div>`;
+}
 function vHome(){
   const ids=Object.keys(db.rondas).sort().reverse();
   return `<h1>Golf</h1>${ok?`<div class=ok>${ok}</div>`:''}${msg?`<div class=err>${esc(msg)}</div>`:''}
@@ -354,6 +329,7 @@ function vHome(){
 }
 function vHoyo(){
   const r=R(),n=r.hoyo,h=H(n),p=par(n);
+  if(!Array.isArray(h.apchFlags))h.apchFlags=[];
   let tot=0,totA=0,pp=0,jugados=0;
   for(let i=1;i<=18;i++){const x=r.h[i];if(x&&x.ok){tot+=mio(i);pp+=par(i);jugados++;if(r.tieneAmigo)totA+=(x.am||0)}}
   return `<div class=hd><b>${esc(r.cancha)}</b><span class=hn>${n}</span><span class=tg>PAR ${p}<br>HCP ${hcp(n)}</span></div>
@@ -380,11 +356,13 @@ function vResumen(){
   const filasResultados=ETQ.map(e=>`<tr><td>${e}</td>${amigo?`<td>${resA[e]}</td>`:''}<td>${resM[e]}</td></tr>`).join('');
 
 
+
   const target=targetTramo(r,esFinal);
   const realPutt=sumaCat(hoyos,r,'pg'),realApch=sumaCat(hoyos,r,'ag'),realS23=sumaCat(hoyos,r,'s'),realPen=sumaCat(hoyos,r,'pen');
   const targetTotal=target.putt+target.apch+target.s23+target.pen;
   const filasObjetivo=[['PUTT',realPutt,target.putt],['APCH',realApch,target.apch],['S+2+3',realS23,target.s23],['PEN',realPen,target.pen],['TOTAL',mioTot,targetTotal]]
     .map(([cat,real,obj])=>`<tr><td>${cat}</td><td>${real}</td><td>${obj}</td><td>${signo(real-obj)}</td></tr>`).join('');
+
 
 
   return `<h1>${resumenTipo==='ida'?'RESUMEN IDA':'RESUMEN FINAL'}</h1><div class=run>${esc(r.cancha)} · ${hoyos.length} hoyos cargados</div>
@@ -415,9 +393,11 @@ function vControl(){
 function vTips(){
 
 
+
   const bloque=(titulo,key)=>`
     <div class="blk">
       <div class="lbl">${titulo}</div>
+
 
 
       ${[0,1,2,3,4].map(i=>`
@@ -428,18 +408,22 @@ function vTips(){
       `).join('')}
 
 
+
     </div>
   `;
+
 
 
   return `
     <h1>TIPS</h1>
 
 
+
     ${bloque('Rutina','rutina')}
     ${bloque('S2+3','s23')}
     ${bloque('APCH','apch')}
     ${bloque('PUTTS','putts')}
+
 
 
     <div class="bar">
@@ -457,53 +441,23 @@ function sheet(){
     </div>`;
   }
   if(irA){const r=R();return `<div class=ov onclick="irA=false;render()"></div><div class=sh><h3>Ir al hoyo</h3><div class=gr>${[...Array(18)].map((_,i)=>`<button class="${i+1==r.hoyo?'sel':(r.h[i+1]&&r.h[i+1].ok)?'dn':''}" onclick="ir(${i+1})">${i+1}</button>`).join('')}</div></div>`}
-if(apchPicker){
-  const golpes=[1,2,3,4,5];
-  const flags=['BKR','LAR','COR','IZQ','DER'];
-
-  return `
-  <div class=ov></div>
-  <div class=sh>
-    <h3>Approach</h3>
-
-    <div class=gr>
-      ${golpes.map(v=>`
-        <button
-          class="${apchPicker.golpes===v?'sel':''}"
-          onclick="setApchGolpes(${v})">
-          ${v}
-        </button>
-      `).join('')}
-    </div>
-
-    <div style="height:10px"></div>
-
-    <div class=gr>
-      ${flags.map(f=>`
-        <button
-          class="${apchPicker.flags.includes(f)?'dn':''}"
-          onclick="toggleApchFlag('${f}')"
-          ${(apchPicker.golpes===1 && f==='BKR')?'disabled':''}>
-          ${f}
-        </button>
-      `).join('')}
-    </div>
-
-    <button
-      class="pri"
-      style="width:100%;margin-top:10px"
-      onclick="guardarApch()">
-      ACEPTAR
-    </button>
-  </div>`;
-}
-
-if(picker){
-  const cur=H(R().hoyo)[picker.k],b=[];
-  for(let v=picker.min;v<=picker.max;v+=picker.step)
-    b.push(`<button class="${v==cur?'sel':''}" onclick="setv(${v})">${v}</button>`);
-
+  if(picker){
+  const h=H(R().hoyo);
+  if(picker.k==='ag'){
+    const flags=Array.isArray(h.apchFlags)?h.apchFlags:[];
+    const numeros=[1,2,3,4,5].map(v=>`<button class="${v==h.ag?'sel':''}" onclick="setApchGolpes(${v})">${v}</button>`).join('');
+    const banderas=APCH_FLAGS.map(f=>{
+      const off=f==='BKR'&&h.ag===1;
+      const sel=flags.includes(f);
+      return `<button class="${sel?'sel':''}${off?' off':''}" ${off?'disabled':''} onclick="toggleApchFlag('${f}')">${f}</button>`;
+    }).join('');
+    return `<div class=ov onclick="picker=null;render()"></div><div class=sh><h3>${picker.t}</h3><div class=gr>${numeros}</div><div class=gr style="margin-top:8px">${banderas}</div></div>`;
+  }
+  const cur=h[picker.k],b=[];
+  for(let v=picker.min;v<=picker.max;v+=picker.step)b.push(`<button class="${v==cur?'sel':''}" onclick="setv(${v})">${v}</button>`);
   return `<div class=ov onclick="picker=null;render()"></div><div class=sh><h3>${picker.t}</h3><div class=gr>${b.join('')}</div></div>`;
+}
+  return '';
 }
 function render(){
   if((vista=='hoyo'||vista=='resumen'||vista=='control'||vista=='tips')&&!R()) vista='home';
@@ -519,6 +473,7 @@ function render(){
 }
 if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');
+
 
 vista='home';
 render();
