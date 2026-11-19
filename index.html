@@ -57,7 +57,8 @@ const CANCHAS={
   "Ituzaingo (Blancas)":[[4,13],[5,1],[4,15],[3,17],[4,3],[4,11],[4,5],[4,9],[3,7],[4,2],[4,8],[3,6],[5,4],[4,12],[4,14],[5,6],[3,18],[4,10]],
 };
 const ETQ=['Eagle','Birdie','Par','Bogey','Doble+'];
-const APCH_FLAGS=['BKR','LAR','COR','IZQ','DER'];
+const S23_FLAGS = ['S23_OBST'];
+const APCH_FLAGS = ['BKR', 'LAR', 'COR', 'IZQ', 'DER', 'APCH_OBST'];
 const KEY='golf_v1';
 let db=JSON.parse(localStorage.getItem(KEY)||'null')||{
   actual:null,
@@ -115,7 +116,7 @@ function sumaCat(hoyos,r,campo){
 function save(){try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){msg='No se pudo guardar en el celular: '+e.message}}
 const R=()=>db.rondas[db.actual];
 const par=n=>CANCHAS[R().cancha][n-1][0], hcp=n=>CANCHAS[R().cancha][n-1][1];
-function H(n){const r=R();return r.h[n]||(r.h[n]={pp:0,pg:0,ay:0,ag:0,pen:0,s:0,am:0,ok:0,apchFlags:[]})}
+function H(n){const r=R();return r.h[n]||(r.h[n]={pp:0,pg:0,ay:0,ag:0,pen:0,s:0,am:0,ok:0,apchFlags:[],s23Flags:[]})}
 const mio=(n)=>{const h=H(n);return h.pg+h.ag+(par(n)==3?0:h.s)+h.pen};
 function hayAmigo(){const r=R();return !!(r.amigo&&r.tieneAmigo)}
 function hoyosJugados(hasta){const r=R(),res=[];for(let i=1;i<=hasta;i++){if(r.h[i]&&r.h[i].ok)res.push(i)}return res}
@@ -182,6 +183,22 @@ function setApchGolpes(v){
     if(!Array.isArray(h.apchFlags))h.apchFlags=[];
     h.apchFlags=h.apchFlags.filter(f=>f!=='BKR');
   }
+  save();
+  render();
+}
+function setS23Golpes(v){
+  const h=H(R().hoyo);
+  h.s=v;
+  save();
+  render();
+}
+
+function toggleS23Flag(f){
+  const h=H(R().hoyo);
+  if(!Array.isArray(h.s23Flags))h.s23Flags=[];
+  const i=h.s23Flags.indexOf(f);
+  if(i>=0)h.s23Flags.splice(i,1);
+  else h.s23Flags.push(f);
   save();
   render();
 }
@@ -330,6 +347,7 @@ function vHome(){
 function vHoyo(){
   const r=R(),n=r.hoyo,h=H(n),p=par(n);
   if(!Array.isArray(h.apchFlags))h.apchFlags=[];
+  if(!Array.isArray(h.s23Flags))h.s23Flags=[];
   let tot=0,totA=0,pp=0,jugados=0;
   for(let i=1;i<=18;i++){const x=r.h[i];if(x&&x.ok){tot+=mio(i);pp+=par(i);jugados++;if(r.tieneAmigo)totA+=(x.am||0)}}
   return `<div class=hd><b>${esc(r.cancha)}</b><span class=hn>${n}</span><span class=tg>PAR ${p}<br>HCP ${hcp(n)}</span></div>
@@ -443,16 +461,29 @@ function sheet(){
   if(irA){const r=R();return `<div class=ov onclick="irA=false;render()"></div><div class=sh><h3>Ir al hoyo</h3><div class=gr>${[...Array(18)].map((_,i)=>`<button class="${i+1==r.hoyo?'sel':(r.h[i+1]&&r.h[i+1].ok)?'dn':''}" onclick="ir(${i+1})">${i+1}</button>`).join('')}</div></div>`}
   if(picker){
   const h=H(R().hoyo);
-  if(picker.k==='ag'){
-    const flags=Array.isArray(h.apchFlags)?h.apchFlags:[];
-    const numeros=[1,2,3,4,5].map(v=>`<button class="${v==h.ag?'sel':''}" onclick="setApchGolpes(${v})">${v}</button>`).join('');
-    const banderas=APCH_FLAGS.map(f=>{
-      const off=f==='BKR'&&h.ag===1;
-      const sel=flags.includes(f);
-      return `<button class="${sel?'sel':''}${off?' off':''}" ${off?'disabled':''} onclick="toggleApchFlag('${f}')">${f}</button>`;
-    }).join('');
-    return `<div class=ov onclick="picker=null;render()"></div><div class=sh><h3>${picker.t}</h3><div class=gr>${numeros}</div><div class=gr style="margin-top:8px">${banderas}</div></div>`;
-  }
+if(picker.k==='ag'){
+  const flags=Array.isArray(h.apchFlags)?h.apchFlags:[];
+  const numeros=[1,2,3,4,5].map(v=>`<button class="${v==h.ag?'sel':''}" onclick="setApchGolpes(${v})">${v}</button>`).join('');
+  const banderas=APCH_FLAGS.map(f=>{
+    const visible=f==='APCH_OBST'?'OBST':f;
+    const off=f==='BKR'&&h.ag===1;
+    const sel=flags.includes(f);
+    return `<button class="${sel?'sel':''}${off?' off':''}" ${off?'disabled':''} onclick="toggleApchFlag('${f}')">${visible}</button>`;
+  }).join('');
+  return `<div class=ov onclick="picker=null;render()"></div><div class=sh><h3>${picker.t}</h3><div class=gr>${numeros}</div><div class=gr style="margin-top:8px">${banderas}</div></div>`;
+}
+
+if(picker.k==='s'){
+  const flags=Array.isArray(h.s23Flags)?h.s23Flags:[];
+  const numeros=[1,2,3,4,5].map(v=>`<button class="${v==h.s?'sel':''}" onclick="setS23Golpes(${v})">${v}</button>`).join('');
+  const banderas=S23_FLAGS.map(f=>{
+    const visible=f==='S23_OBST'?'OBST':f;
+    const sel=flags.includes(f);
+    return `<button class="${sel?'sel':''}" onclick="toggleS23Flag('${f}')">${visible}</button>`;
+  }).join('');
+  return `<div class=ov onclick="picker=null;render()"></div><div class=sh><h3>${picker.t}</h3><div class=gr>${numeros}</div><div class=gr style="margin-top:8px">${banderas}</div></div>`;
+}
+  
   const cur=h[picker.k],b=[];
   for(let v=picker.min;v<=picker.max;v+=picker.step)b.push(`<button class="${v==cur?'sel':''}" onclick="setv(${v})">${v}</button>`);
   return `<div class=ov onclick="picker=null;render()"></div><div class=sh><h3>${picker.t}</h3><div class=gr>${b.join('')}</div></div>`;
